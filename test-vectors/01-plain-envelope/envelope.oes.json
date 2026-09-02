@@ -1,0 +1,32 @@
+{
+  "@context": "https://openevidence.org/signing/v1",
+  "version": "1.0",
+  "id": "env_vec_plain_0001",
+  "issuer": {
+    "id": "https://app.screenata.example",
+    "name": "Screenata (test)",
+    "keyDiscovery": "https://app.screenata.example/.well-known/oes-signing"
+  },
+  "subject": {
+    "type": "compliance-evidence",
+    "contentHash": {
+      "algorithm": "SHA-256",
+      "value": "968cf4029649c428bb95df41be7e08df4b5b4ad571a56d5ab02a22094e72fe6d"
+    },
+    "metadata": {
+      "title": "AWS IAM MFA export",
+      "collectedAt": "2026-04-20T10:30:00.000Z",
+      "framework": "SOC 2",
+      "controlRef": "CC6.1"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2024",
+    "created": "2026-04-20T10:30:00.000Z",
+    "algorithm": "RSA-SHA256",
+    "publicKeyFingerprint": "549f3b9895b9b973",
+    "signatureValue": "VamHE4+fmVENH6c+rQrggEJKO9Z5pl91nHm6eEv5HxQ7rTZTTIpqrA3VcwbipBidabmawe847xp6J06jsDs2hUe+A26+d3p1OgBMLqwnxRnJnnNXJs6CQlnIg8AVD3t45kaYGpokY6TCYhGw1wbB41pL6AbFMhV8ssrHYs0DuGaBxEFZJ/FPzsfrlTI78bWm9BQdoLVq/83A8etjFNquwnQm/BUAFZYSlCrgvLWWUC59i23J3Ek/EMMdoso4fUEYDEvDjvNDRCxlOR09SOfvS3jh/1I7kSAtCBlIpfWbtXHT4ib1hjVOEBsZ79VV2xgYSZ0z+pGMzB/P3bUpSfTufA==",
+    "canonicalization": "sorted-keys-2space",
+    "signedFields": "subject"
+  }
+}

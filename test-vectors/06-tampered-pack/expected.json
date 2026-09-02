@@ -1,0 +1,10 @@
+{
+  "description": "A pack whose file bytes were swapped after the manifest was signed — file hash check must fail.",
+  "artifact": "zip",
+  "target": "pack.zip",
+  "keys": "../issuer-discovery.json",
+  "expect": {
+    "valid": false,
+    "errorsMatch": "hash mismatch"
+  }
+}

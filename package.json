@@ -1,0 +1,73 @@
+{
+  "name": "open-evidence-signing",
+  "version": "0.0.1",
+  "description": "Zero-dependency library and CLI for the Open Evidence Signing (OES) v1.0 format — sign and verify compliance evidence that anyone can check without trusting the issuer.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Screenata<support@screenata.com>",
+  "homepage": "https://github.com/Screenata/open-evidence-signing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Screenata/open-evidence-signing.git"
+  },
+  "keywords": [
+    "compliance",
+    "evidence",
+    "signing",
+    "verification",
+    "rfc3161",
+    "soc2",
+    "hipaa",
+    "audit",
+    "oes"
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "oes": "bin/oes-verify.js",
+    "oes-verify": "bin/oes-verify.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "schema",
+    "docs",
+    "python/oes_verify.py",
+    "SPEC.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outfile ./dist/index.js --target node && bun build ./src/cli.ts --outfile ./dist/cli.js --target node && tsc -p tsconfig.json --emitDeclarationOnly --outDir dist",
+    "dev": "bun run ./src/cli.ts",
+    "test": "vitest run",
+    "prepack": "bun run build",
+    "prepublishOnly": "node -e \"require('fs').existsSync('dist/index.d.ts')||(console.error('dist/index.d.ts missing — run build'),process.exit(1))\"",
+    "publish:dry": "pnpm publish --access public --no-git-checks --dry-run",
+    "release": "pnpm publish --access public --no-git-checks",
+    "mirror": "bash scripts/mirror.sh"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.6"
+  }
+}

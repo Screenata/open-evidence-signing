@@ -1,0 +1,12 @@
+{
+  "description": "A single text evidence file with a plain (no-TSA) envelope.",
+  "artifact": "envelope",
+  "target": "envelope.oes.json",
+  "content": "evidence.txt",
+  "keys": "../issuer-discovery.json",
+  "expect": {
+    "valid": true,
+    "contentHashVerified": true,
+    "timestamped": false
+  }
+}

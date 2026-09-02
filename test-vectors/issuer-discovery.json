@@ -1,0 +1,18 @@
+{
+  "issuer": "https://app.screenata.example",
+  "specVersion": "1.0",
+  "keys": [
+    {
+      "fingerprint": "549f3b9895b9b973",
+      "algorithm": "RSA-SHA256",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArMbsTLD9MaVbCpAIqUPO\nWtnPK2N51M+BWN3dyfPtwc4QG5hhZeZhO2y/8OKEXl24wOpf1mXIFQ8GLSt7rGNN\nErM7KDxjhShipUFgYtXCY9/RSs+HALDtu3AhMcBUVfq+Z9FOeHnru8oK2+xrvBGY\nkoodfRtVaHralYvdDyTcwHJlOSmqMwLe2feGGUdz+SCEWboCswMbw5I8/k/8TiUY\nd0FKYNANH+TEi5/hySQL/eM73exIOjPuNBd2rT8T5oyCQoU3gGSE/QmHJcjS1E28\nrRjIrbGT5f9Z3rtdjP687zQvIvUFdnWbwwvcK+65NxXWkCgJl89fVtiSdorCdBVy\ntQIDAQAB\n-----END PUBLIC KEY-----\n",
+      "validFrom": "2026-01-01T00:00:00Z",
+      "validTo": null,
+      "revoked": false
+    }
+  ],
+  "supportedAlgorithms": [
+    "RSA-SHA256",
+    "ECDSA-SHA256"
+  ]
+}

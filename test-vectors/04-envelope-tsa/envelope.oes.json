@@ -1,0 +1,37 @@
+{
+  "@context": "https://openevidence.org/signing/v1",
+  "version": "1.0",
+  "id": "env_vec_tsa_0004",
+  "issuer": {
+    "id": "https://app.screenata.example",
+    "name": "Screenata (test)",
+    "keyDiscovery": "https://app.screenata.example/.well-known/oes-signing"
+  },
+  "subject": {
+    "type": "compliance-evidence",
+    "contentHash": {
+      "algorithm": "SHA-256",
+      "value": "5d32e635325ca4b8f62c8af8163f414f75495b81939f8e315ef1e876fc47affe"
+    },
+    "metadata": {
+      "title": "Timestamped evidence",
+      "collectedAt": "2026-04-20T10:30:00.000Z"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2024",
+    "created": "2026-04-20T10:30:00.000Z",
+    "algorithm": "RSA-SHA256",
+    "publicKeyFingerprint": "549f3b9895b9b973",
+    "signatureValue": "H8M1MZYxN2ot/ocA7sDH1Dn88VB64C+A8g10TBx1i4myTMeogS9WiV4KEPmfH7v0ac8WYgQKnSno/52Ns3dbHtJGo9O77Y/kH0DRcgdtVFGb4dpyCuxEdflmjQ1xfJXu1a/qwi4ST/IPurZzbFMXlMKN4xFu8sSPMZroc6UgIeM4dn9I6Sxnaub3LLiHVBZviKVc2UGtAJ0AO2/Wfnx1nQm0oA8/pDb10+RIEC79mBQBEtEPnJKCcF3wBTTMEEkzuF88a7pNodnTBWnFpzC3vzudt0IrP9og5nfEp+NcF+rFrF/1W6rpPfRqiVlmUohi1O0r5IH7QIwOSeB2epFhNw==",
+    "canonicalization": "sorted-keys-2space",
+    "signedFields": "subject",
+    "timestamp": {
+      "type": "RFC3161",
+      "token": "MHoGCSqGSIb3DQEHAqBtMGsCAQMxADBkBgsqhkiG9w0BCRABBKBVBFMwUQIBAQYEKgMEATAxMA0GCWCGSAFlAwQCAQUABCAuvnGyyyER/8qWigOKQAuIhL6xtAYLrJQjtdLUAHa1yAICEJIYDzIwMjYwNDIwMTAzMDA2Wg==",
+      "authority": "http://timestamp.test (synthetic)",
+      "timestampedAt": "2026-04-20T10:30:06.000Z",
+      "serialNumber": "4242"
+    }
+  }
+}

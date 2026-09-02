@@ -1,0 +1,11 @@
+{
+  "description": "Envelope signed by a key absent from the discovery document — key resolution must fail.",
+  "artifact": "envelope",
+  "target": "envelope.oes.json",
+  "content": "evidence.txt",
+  "keys": "../issuer-discovery.json",
+  "expect": {
+    "valid": false,
+    "errorsMatch": "not found"
+  }
+}

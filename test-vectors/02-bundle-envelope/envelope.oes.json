@@ -1,0 +1,52 @@
+{
+  "@context": "https://openevidence.org/signing/v1",
+  "version": "1.0",
+  "id": "env_vec_bundle_0002",
+  "issuer": {
+    "id": "https://app.screenata.example",
+    "name": "Screenata (test)",
+    "keyDiscovery": "https://app.screenata.example/.well-known/oes-signing"
+  },
+  "subject": {
+    "type": "compliance-evidence:bundle",
+    "contentHash": {
+      "algorithm": "SHA-256",
+      "value": "214b332fc92d1cec131e1716f3bbac0930e04b232aa9b9828e69e949e2f20758"
+    },
+    "files": [
+      {
+        "filename": "screenshots/01_mfa_settings.png",
+        "contentHash": {
+          "algorithm": "SHA-256",
+          "value": "aeb673b66905a1f9d4d3c56a5c89efd154db9eeeea0bb617680db458acdd3954"
+        },
+        "size": 36,
+        "mediaType": "image/png"
+      },
+      {
+        "filename": "attachments/iam-policy.json",
+        "contentHash": {
+          "algorithm": "SHA-256",
+          "value": "9d391b2545d5759d9da6d881eac381b9fbe34d0256468736ed04a92d238e432d"
+        },
+        "size": 38,
+        "mediaType": "application/json"
+      }
+    ],
+    "metadata": {
+      "title": "MFA bundle",
+      "collectedAt": "2026-04-20T10:30:00.000Z",
+      "framework": "SOC 2",
+      "controlRef": "CC6.1"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2024",
+    "created": "2026-04-20T10:30:00.000Z",
+    "algorithm": "RSA-SHA256",
+    "publicKeyFingerprint": "549f3b9895b9b973",
+    "signatureValue": "C34eke05nQr4NXnYOFQNTtUR6589srkBrOK7PHhPS0ssvoweM9JDDw/5mISonJvrJSTm9g7iMCWHp7fF1fCBhptBzErTEpLjBp7JnyOz3LfNKTd0JKWFhNLGzcDe9CB372Zrf+gHJWAnEMQT5kfBGLwONFHipHcR/9R7ILdVbAk5MyeRgFqNPK4zeJfGtxPA2NOOjAe/Zo6fvfbndwsmeu6/Zi/gfJ6RnnJt11mE4nG20GZ7Mdf+gofTXS2B0ePvonGW7tbQBX2e305cTPG4DcyjUqiRI15oo4MFvzhFKBkvDHZ5L2Y3Ktwl6IHKHuB6F7Didb8HSuJp2nTLdX3nKw==",
+    "canonicalization": "sorted-keys-2space",
+    "signedFields": "subject"
+  }
+}

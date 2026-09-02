@@ -1,0 +1,13 @@
+{
+  "description": "Envelope carrying a SYNTHETIC RFC 3161 timestamp (no real TSA cert) — exercises the imprint + genTime binding.",
+  "artifact": "envelope",
+  "target": "envelope.oes.json",
+  "content": "evidence.txt",
+  "keys": "../issuer-discovery.json",
+  "syntheticTimestamp": true,
+  "expect": {
+    "valid": true,
+    "contentHashVerified": true,
+    "timestamped": true
+  }
+}

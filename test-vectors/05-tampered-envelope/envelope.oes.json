@@ -1,0 +1,31 @@
+{
+  "@context": "https://openevidence.org/signing/v1",
+  "version": "1.0",
+  "id": "env_vec_tamper_0005",
+  "issuer": {
+    "id": "https://app.screenata.example",
+    "name": "Screenata (test)",
+    "keyDiscovery": "https://app.screenata.example/.well-known/oes-signing"
+  },
+  "subject": {
+    "type": "compliance-evidence",
+    "contentHash": {
+      "algorithm": "SHA-256",
+      "value": "a2a347c02e5276c63eebe3b260b2e5a1e576ce2a3f757adfd2c3d671cb85a67e"
+    },
+    "metadata": {
+      "title": "Original title",
+      "collectedAt": "2026-04-20T10:30:00.000Z",
+      "controlRef": "CC7.2"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2024",
+    "created": "2026-04-20T10:30:00.000Z",
+    "algorithm": "RSA-SHA256",
+    "publicKeyFingerprint": "549f3b9895b9b973",
+    "signatureValue": "SZSOMxWMD67DiGmRyhx/Z5HF2BfDoMtMSy6zXM27ur1bXq2I2aodIIquIzi8NmJv5N3+opwrrJhZx10m599tFSgpGqVZLrNDIunS4fLHSdy/YLhNclGY18OP/JvabpZ63+/1blv9UywILXxWI1pBT7osEBfZdjicqzHqT+yPKjZk5Op+vPN74Wj3h84j7ElUzoMQ47VlUXHvImSDirCl2iSpy+Wo+TQaCB9opBJtr1SK8M3wHC1zRtcsyH7nGwzeptCLOy9MxMd1vN01HPlnbujQCIml97ns6q9U78s97/AvYTY9zQVkaVj7qqAzwp+lMw7sEqct5XtKanGTXnlDhQ==",
+    "canonicalization": "sorted-keys-2space",
+    "signedFields": "subject"
+  }
+}

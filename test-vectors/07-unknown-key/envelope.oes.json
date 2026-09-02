@@ -1,0 +1,30 @@
+{
+  "@context": "https://openevidence.org/signing/v1",
+  "version": "1.0",
+  "id": "env_vec_unknown_0007",
+  "issuer": {
+    "id": "https://app.screenata.example",
+    "name": "Screenata (test)",
+    "keyDiscovery": "https://app.screenata.example/.well-known/oes-signing"
+  },
+  "subject": {
+    "type": "compliance-evidence",
+    "contentHash": {
+      "algorithm": "SHA-256",
+      "value": "f3d8ff9363d641ac34699ac56636c736dcb97954980a66e53656219497feb56a"
+    },
+    "metadata": {
+      "title": "Unknown key",
+      "collectedAt": "2026-04-20T10:30:00.000Z"
+    }
+  },
+  "proof": {
+    "type": "RsaSignature2024",
+    "created": "2026-04-20T10:30:00.000Z",
+    "algorithm": "RSA-SHA256",
+    "publicKeyFingerprint": "b95e3e4fa7352d4a",
+    "signatureValue": "aV6vIzaUc62r73E9+EdIYaJYlYlVU89OX6QC+fxWLNyVQvtF77AWkhMz9k51Oc5JEtAEoLJnRF7UPXSrRwTaZTUJIlXN2IVR57vMg+IYzW7VDEfQc5we1CZOUQ1cOprJfTqMlOHFAH5yc1fDvxD1B+I6IdOye8krq7Xsme050i2QckMocvCgvC7Vo/Xhs+RK5ZhC4t1zeuFAKkO5BlvZfh3L18u2tmUaKWr08elIitNXVgT184VS+mmQgjEDWvnigOvyqLZntp2KNz1NxwVjduWdpLYL9KWalvA7DHlnM6AY3VIZrsZlv3YTIZwMo8vEAXhLEolx2MfYGvvUNs8YkA==",
+    "canonicalization": "sorted-keys-2space",
+    "signedFields": "subject"
+  }
+}

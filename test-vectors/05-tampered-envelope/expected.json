@@ -1,0 +1,11 @@
+{
+  "description": "Subject metadata altered after signing — signature must fail.",
+  "artifact": "envelope",
+  "target": "envelope.oes.json",
+  "content": "evidence.txt",
+  "keys": "../issuer-discovery.json",
+  "expect": {
+    "valid": false,
+    "errorsMatch": "Invalid signature"
+  }
+}

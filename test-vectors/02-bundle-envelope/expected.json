@@ -1,0 +1,12 @@
+{
+  "description": "A multi-file ZIP bundle. Whole-bundle content hash + per-file subject.files[] hashes.",
+  "artifact": "envelope",
+  "target": "envelope.oes.json",
+  "content": "bundle.zip",
+  "keys": "../issuer-discovery.json",
+  "expect": {
+    "valid": true,
+    "contentHashVerified": true,
+    "bundleFiles": true
+  }
+}

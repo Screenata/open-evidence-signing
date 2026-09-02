@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openevidence.org/signing/v1/envelope.schema.json",
+  "title": "OES Evidence Signing Envelope (ESE) v1.0",
+  "description": "Schema for an Open Evidence Signing envelope per OPEN-EVIDENCE-SPEC-v1 §3.",
+  "type": "object",
+  "required": ["@context", "version", "issuer", "subject", "proof"],
+  "properties": {
+    "@context": { "const": "https://openevidence.org/signing/v1" },
+    "version": { "const": "1.0" },
+    "id": { "type": "string" },
+    "issuer": {
+      "type": "object",
+      "required": ["id", "keyDiscovery"],
+      "properties": {
+        "id": { "type": "string", "format": "uri" },
+        "name": { "type": "string" },
+        "keyDiscovery": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": true
+    },
+    "subject": {
+      "type": "object",
+      "required": ["type", "contentHash"],
+      "properties": {
+        "type": { "type": "string" },
+        "contentHash": { "$ref": "#/$defs/contentHash" },
+        "files": { "type": "array", "items": { "$ref": "#/$defs/file" } },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "collectedAt": { "type": "string", "format": "date-time" },
+            "collector": { "type": "string" },
+            "framework": { "type": "string" },
+            "controlRef": { "type": "string" },
+            "description": { "type": "string" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "proof": {
+      "type": "object",
+      "required": [
+        "type",
+        "created",
+        "algorithm",
+        "publicKeyFingerprint",
+        "signatureValue",
+        "canonicalization",
+        "signedFields"
+      ],
+      "properties": {
+        "type": { "type": "string", "enum": ["RsaSignature2024", "EcdsaSignature2024"] },
+        "created": { "type": "string", "format": "date-time" },
+        "algorithm": { "type": "string", "enum": ["RSA-SHA256", "ECDSA-SHA256"] },
+        "publicKeyFingerprint": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+        "signatureValue": { "type": "string" },
+        "canonicalization": { "const": "sorted-keys-2space" },
+        "signedFields": { "const": "subject" },
+        "timestamp": {
+          "type": "object",
+          "required": ["type", "token", "authority", "timestampedAt", "serialNumber"],
+          "properties": {
+            "type": { "const": "RFC3161" },
+            "token": { "type": "string", "contentEncoding": "base64" },
+            "authority": { "type": "string" },
+            "timestampedAt": { "type": "string", "format": "date-time" },
+            "serialNumber": { "type": "string" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "contentHash": {
+      "type": "object",
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": { "const": "SHA-256" },
+        "value": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "file": {
+      "type": "object",
+      "required": ["filename", "contentHash", "size"],
+      "properties": {
+        "filename": { "type": "string" },
+        "contentHash": { "$ref": "#/$defs/contentHash" },
+        "size": { "type": "integer", "minimum": 0 },
+        "mediaType": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  }
+}
