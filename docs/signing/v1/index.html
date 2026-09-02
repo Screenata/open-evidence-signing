@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Evidence Signing (OES v1.0) — Protocol Spec</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --c-bg: #f8fafc;
+      --c-canvas: #ffffff;
+      --c-border: #cbd5e1;
+      --c-border-strong: #94a3b8;
+      --c-text-main: #0f172a;
+      --c-text-sub: #64748b;
+      --c-text-mute: #94a3b8;
+      --c-accent: #dc2626;
+      --c-warn: #d97706;
+      --c-ok: #15803d;
+      --font-ui: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-ui);
+      background: var(--c-bg);
+      color: var(--c-text-main);
+      padding: 40px 24px;
+      min-height: 100vh;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .page { max-width: 1200px; margin: 0 auto; }
+    .page-header { border: 1px solid var(--c-border); background: var(--c-canvas); padding: 32px; margin-bottom: 24px; }
+    .page-title { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; }
+    .page-subtitle { margin-top: 6px; font-size: 11px; font-weight: 500; color: var(--c-text-sub); text-transform: uppercase; letter-spacing: 0.08em; }
+    .page-meta { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--c-border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; font-family: var(--font-mono); font-size: 11px; }
+    .page-meta-cell { display: flex; flex-direction: column; gap: 4px; }
+    .page-meta-key { color: var(--c-text-sub); text-transform: uppercase; letter-spacing: 0.05em; }
+    .page-meta-val { color: var(--c-text-main); }
+    .section { border: 1px solid var(--c-border); background: var(--c-canvas); padding: 28px 32px; margin-bottom: 24px; }
+    .section-header { border-bottom: 1px solid var(--c-border); padding-bottom: 14px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+    .section-number { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-sub); text-transform: uppercase; letter-spacing: 0.08em; }
+    .section-title { font-size: 18px; font-weight: 600; flex: 1; }
+    .section-tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 6px; border: 1px solid var(--c-border); color: var(--c-text-sub); }
+    p { margin-bottom: 12px; color: var(--c-text-main); }
+    p + p { margin-top: 0; }
+    p code, li code, td code, dd code { font-family: var(--font-mono); font-size: 12.5px; background: var(--c-bg); border: 1px solid var(--c-border); padding: 1px 5px; color: var(--c-text-main); }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 4px; }
+    h3 { font-size: 14px; font-weight: 600; margin-top: 20px; margin-bottom: 10px; color: var(--c-text-main); text-transform: uppercase; letter-spacing: 0.04em; }
+    h3 + p { margin-top: 0; }
+    .canvas { border: 1px solid var(--c-border); background: var(--c-canvas); padding: 24px; margin: 16px 0; }
+    .canvas-caption { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-text-sub); text-align: center; margin-top: 12px; }
+    .node { border: 1px solid var(--c-border-strong); padding: 12px 14px; background: var(--c-canvas); display: flex; flex-direction: column; gap: 4px; }
+    .node-label { font-family: var(--font-mono); font-size: 10px; color: var(--c-text-sub); text-transform: uppercase; letter-spacing: 0.06em; }
+    .node-title { font-size: 13px; font-weight: 600; color: var(--c-text-main); }
+    .node-desc { font-size: 11px; color: var(--c-text-sub); line-height: 1.45; }
+    .node-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--c-text-mute); }
+    .node--accent { border-color: var(--c-text-main); border-width: 2px; }
+    .node--warn { border-color: var(--c-warn); }
+    .badge { display: inline-block; font-family: var(--font-mono); font-size: 10px; padding: 2px 6px; border: 1px solid var(--c-border); color: var(--c-text-sub); text-transform: uppercase; letter-spacing: 0.04em; }
+    .badge--solid { background: var(--c-text-main); color: var(--c-canvas); border-color: var(--c-text-main); }
+    .badge--warn { color: var(--c-warn); border-color: var(--c-warn); }
+    .badge--ok { color: var(--c-ok); border-color: var(--c-ok); }
+    .badge--err { color: var(--c-accent); border-color: var(--c-accent); }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th, td { border: 1px solid var(--c-border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--c-bg); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--c-text-sub); }
+    td.mono { font-family: var(--font-mono); font-size: 12px; }
+    pre { font-family: var(--font-mono); font-size: 12px; background: var(--c-bg); border: 1px solid var(--c-border); padding: 14px 16px; overflow-x: auto; line-height: 1.55; margin: 12px 0; }
+    .callout { border-left: 2px solid var(--c-text-main); padding: 10px 16px; background: var(--c-bg); margin: 14px 0; font-size: 13px; }
+    .callout-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--c-text-sub); margin-bottom: 4px; }
+    .callout--warn { border-color: var(--c-warn); }
+    .callout--warn .callout-title { color: var(--c-warn); }
+    .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; gap: 0; }
+    .flow .node { height: 100%; }
+    .flow-arrow { display: flex; align-items: center; justify-content: center; padding: 0 12px; color: var(--c-text-sub); font-family: var(--font-mono); font-size: 20px; }
+    .flow-vertical { display: flex; flex-direction: column; gap: 0; }
+    .flow-vertical .node { width: 100%; }
+    .flow-vertical .flow-arrow-v { display: flex; justify-content: center; padding: 8px 0; color: var(--c-text-sub); font-family: var(--font-mono); font-size: 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .row-card { border: 1px solid var(--c-border); padding: 18px 20px; margin-bottom: 14px; background: var(--c-canvas); }
+    .row-card-header { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--c-border); margin-bottom: 12px; }
+    .row-card-num { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-sub); min-width: 32px; }
+    .row-card-key { font-family: var(--font-mono); font-size: 12px; color: var(--c-text-main); background: var(--c-bg); padding: 2px 8px; border: 1px solid var(--c-border); }
+    .row-card-name { font-size: 14px; font-weight: 600; flex: 1; }
+    .row-card-grid { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; font-size: 12.5px; }
+    .row-card-key-cell { color: var(--c-text-sub); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .row-card-val { font-family: var(--font-mono); font-size: 12px; }
+    .row-card-val.prose { font-family: var(--font-ui); font-size: 13px; }
+    .tree { font-family: var(--font-mono); font-size: 12px; line-height: 1.85; color: var(--c-text-main); }
+    .tree .cond { color: var(--c-text-sub); }
+    .tree .branch { color: var(--c-text-main); font-weight: 600; }
+    .status-pill { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 11px; padding: 3px 10px; border: 1px solid var(--c-border); letter-spacing: 0.03em; }
+    .status-pill--blocked { color: var(--c-accent); border-color: var(--c-accent); }
+    .status-pill--needs { color: var(--c-warn); border-color: var(--c-warn); }
+    .status-pill--ready { color: var(--c-ok); border-color: var(--c-ok); }
+    .footnote { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--c-border); font-size: 11.5px; color: var(--c-text-sub); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<!-- ─────────────────────────────── HEADER ─────────────────────────────── -->
+<div class="page-header">
+  <div class="page-title">Open Evidence Signing Specification — OES v1.0</div>
+  <div class="page-subtitle">Tamper-Evident Compliance Evidence · Sign · Timestamp · Discover · Verify</div>
+  <div class="page-meta">
+    <div class="page-meta-cell">
+      <div class="page-meta-key">Status</div>
+      <div class="page-meta-val">Stable · v1.0 · Implemented</div>
+    </div>
+    <div class="page-meta-cell">
+      <div class="page-meta-key">Last Reviewed</div>
+      <div class="page-meta-val">2026-05-21</div>
+    </div>
+    <div class="page-meta-cell">
+      <div class="page-meta-key">License</div>
+      <div class="page-meta-val">Apache-2.0</div>
+    </div>
+    <div class="page-meta-cell">
+      <div class="page-meta-key">Reference Impl</div>
+      <div class="page-meta-val">server/src/services/signing/</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 0. ORIENTATION ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 0</div>
+    <div class="section-title">Orientation — What OES Is</div>
+    <div class="section-tag">PRIMER</div>
+  </div>
+
+  <p>The <strong>Open Evidence Signing Specification (OES)</strong> defines a format and protocol for cryptographically signing compliance evidence so that <em>any</em> third party — auditors, GRC platforms, regulators, automated tools — can independently verify the integrity, provenance, and temporal ordering of evidence artifacts <strong>without access to the originating system</strong>.</p>
+
+  <p>It combines three standard primitives: a SHA-256 content hash, a digital signature (RSA or ECDSA) over a canonical JSON <em>subject</em>, and an <a href="https://www.rfc-editor.org/rfc/rfc3161">RFC 3161</a> timestamp from an independent Time Stamping Authority. The result is a single JSON document — the <strong>Evidence Signing Envelope (ESE)</strong> — that is tamper-evident, attributable, and anchored in time. A conforming verifier can be written in under 200 lines in any language with a standard crypto library.</p>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 250" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-mono); font-size: 11px;">
+      <g fill="none" stroke="#0f172a" stroke-width="1.5">
+        <rect x="20" y="50" width="180" height="84"/>
+        <rect x="240" y="50" width="180" height="84"/>
+        <rect x="460" y="50" width="180" height="84"/>
+        <rect x="680" y="50" width="180" height="84"/>
+        <rect x="900" y="50" width="160" height="84"/>
+      </g>
+      <g font-family="JetBrains Mono" fill="#64748b" font-size="10">
+        <text x="30" y="42">STEP 1</text>
+        <text x="250" y="42">STEP 2</text>
+        <text x="470" y="42">STEP 3</text>
+        <text x="690" y="42">STEP 4</text>
+        <text x="910" y="42">STEP 5</text>
+      </g>
+      <g font-family="Inter" font-weight="600" fill="#0f172a" font-size="12">
+        <text x="30" y="78">Content</text>
+        <text x="250" y="78">SHA-256 hash</text>
+        <text x="470" y="78">Sign subject</text>
+        <text x="690" y="78">TSA timestamp</text>
+        <text x="910" y="78">ESE envelope</text>
+      </g>
+      <g font-family="Inter" fill="#64748b" font-size="10.5">
+        <text x="30" y="100">raw evidence</text>
+        <text x="30" y="113">bytes (file/ZIP)</text>
+        <text x="250" y="100">hex digest into</text>
+        <text x="250" y="113">subject.contentHash</text>
+        <text x="470" y="100">RSA/ECDSA over</text>
+        <text x="470" y="113">canonical subject</text>
+        <text x="690" y="100">RFC 3161 over</text>
+        <text x="690" y="113">signature bytes</text>
+        <text x="910" y="100">JSON doc binds</text>
+        <text x="910" y="113">all of the above</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+        <line x1="200" y1="92" x2="240" y2="92"/><polyline points="232,86 240,92 232,98"/>
+        <line x1="420" y1="92" x2="460" y2="92"/><polyline points="452,86 460,92 452,98"/>
+        <line x1="640" y1="92" x2="680" y2="92"/><polyline points="672,86 680,92 672,98"/>
+        <line x1="860" y1="92" x2="900" y2="92"/><polyline points="892,86 900,92 892,98"/>
+      </g>
+      <g stroke="#dc2626" stroke-width="1.5" fill="none">
+        <line x1="20" y1="170" x2="1060" y2="170"/>
+        <line x1="20" y1="170" x2="20" y2="160"/>
+        <line x1="1060" y1="170" x2="1060" y2="160"/>
+      </g>
+      <text x="540" y="200" font-family="Inter" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="600">Producer side: signing pipeline (§4). Consumer side reverses it: verify (§7).</text>
+    </svg>
+    <div class="canvas-caption">Fig 0.1 — The OES signing pipeline: content → hash → signature → timestamp → envelope</div>
+  </div>
+
+  <h3>Concepts you'll meet (one-line each)</h3>
+  <table>
+    <thead><tr><th style="width: 200px">Concept</th><th>One-line</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Issuer</td><td>The system that collects evidence and produces signed envelopes (e.g. a GRC platform).</td></tr>
+      <tr><td class="mono">Evidence</td><td>Any digital artifact proving a compliance claim — screenshot, config export, log, attestation.</td></tr>
+      <tr><td class="mono">Envelope (ESE)</td><td>The JSON document binding a content hash to a cryptographic proof.</td></tr>
+      <tr><td class="mono">Verifier</td><td>Any party or tool that checks an envelope's cryptographic validity.</td></tr>
+      <tr><td class="mono">TSA</td><td>Time Stamping Authority — independent third party issuing RFC 3161 timestamps.</td></tr>
+      <tr><td class="mono">Fingerprint</td><td>First 16 hex chars of SHA-256 of a public key's PEM encoding; identifies a key without sending it.</td></tr>
+      <tr><td class="mono">Discovery doc</td><td>JSON at <code>/.well-known/oes-signing</code> publishing the issuer's public keys.</td></tr>
+      <tr><td class="mono">Canonicalization</td><td><code>sorted-keys-2space</code> — deterministic JSON so the same logical subject always signs identically.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─────────────────────────────── 1. CATALOG ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 1</div>
+    <div class="section-title">The Evidence Signing Envelope (ESE)</div>
+    <div class="section-tag">ENVELOPE</div>
+  </div>
+
+  <p>The ESE is the core artifact. It is a JSON document with four top-level blocks: the spec marker (<code>@context</code>, <code>version</code>, <code>id</code>), the <code>issuer</code>, the <code>subject</code> (what is being proven — including the content hash and metadata), and the <code>proof</code> (the signature and timestamp). The signature covers <em>only</em> the <code>subject</code> block; everything else is routing or attestation about the signature itself.</p>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 430" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-ui); font-size: 11px;">
+      <g fill="none" stroke="#0f172a" stroke-width="1.5"><rect x="20" y="20" width="1040" height="396"/></g>
+      <text x="34" y="42" font-family="JetBrains Mono" font-size="10" fill="#64748b">ESE — @context / version / id</text>
+
+      <!-- issuer -->
+      <g fill="none" stroke="#94a3b8" stroke-width="1"><rect x="40" y="58" width="480" height="120"/></g>
+      <text x="54" y="78" font-family="JetBrains Mono" font-size="10" fill="#dc2626">issuer</text>
+      <g font-family="JetBrains Mono" font-size="11" fill="#0f172a">
+        <text x="54" y="100">id            origin URL</text>
+        <text x="54" y="120">name          human-readable</text>
+        <text x="54" y="140">keyDiscovery  /.well-known/oes-signing</text>
+      </g>
+      <text x="54" y="166" font-family="Inter" font-size="10.5" fill="#64748b">Routing — who signed, where to fetch their key (§5).</text>
+
+      <!-- subject (the signed part) -->
+      <g fill="none" stroke="#0f172a" stroke-width="2"><rect x="40" y="196" width="480" height="200"/></g>
+      <text x="54" y="216" font-family="JetBrains Mono" font-size="10" fill="#dc2626">subject  ← THE SIGNED BYTES (canonicalized)</text>
+      <g font-family="JetBrains Mono" font-size="11" fill="#0f172a">
+        <text x="54" y="238">type          compliance-evidence:*</text>
+        <text x="54" y="258">contentHash   { algorithm:SHA-256, value }</text>
+        <text x="54" y="278">files[]       per-file hash/size/mediaType</text>
+        <text x="54" y="298">metadata      title, collectedAt, framework,</text>
+        <text x="74" y="314">              controlRef, collector, …</text>
+      </g>
+      <text x="54" y="346" font-family="Inter" font-size="10.5" fill="#64748b">Everything inside subject is bound by the signature.</text>
+      <text x="54" y="362" font-family="Inter" font-size="10.5" fill="#64748b">Change one byte here → signature fails to verify.</text>
+
+      <!-- proof -->
+      <g fill="none" stroke="#94a3b8" stroke-width="1"><rect x="540" y="58" width="500" height="338"/></g>
+      <text x="554" y="78" font-family="JetBrains Mono" font-size="10" fill="#dc2626">proof</text>
+      <g font-family="JetBrains Mono" font-size="11" fill="#0f172a">
+        <text x="554" y="100">type                 RsaSignature2024 |</text>
+        <text x="574" y="116">                     EcdsaSignature2024</text>
+        <text x="554" y="138">created              ISO 8601</text>
+        <text x="554" y="158">algorithm            RSA-SHA256 | ECDSA-SHA256</text>
+        <text x="554" y="178">publicKeyFingerprint 16 hex chars</text>
+        <text x="554" y="198">signatureValue       base64 over canonical subject</text>
+        <text x="554" y="218">canonicalization     sorted-keys-2space</text>
+        <text x="554" y="238">signedFields         "subject"</text>
+      </g>
+      <g fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"><rect x="554" y="256" width="472" height="124"/></g>
+      <text x="566" y="276" font-family="JetBrains Mono" font-size="10" fill="#64748b">proof.timestamp  (SHOULD — RFC 3161)</text>
+      <g font-family="JetBrains Mono" font-size="11" fill="#0f172a">
+        <text x="566" y="298">type            RFC3161</text>
+        <text x="566" y="316">token           base64 DER TimeStampToken</text>
+        <text x="566" y="334">authority       TSA URL</text>
+        <text x="566" y="352">timestampedAt   ISO 8601 (TSTInfo.genTime)</text>
+        <text x="566" y="370">serialNumber    TSA-assigned</text>
+      </g>
+    </svg>
+    <div class="canvas-caption">Fig 1.1 — ESE structure. Solid double border = the canonicalized subject the signature covers.</div>
+  </div>
+
+  <h3>Field requirements (selected)</h3>
+  <table>
+    <thead><tr><th>Field</th><th style="width:90px">Level</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">@context</td><td><span class="badge--solid badge">MUST</span></td><td>Always <code>https://openevidence.dev/signing/v1</code></td></tr>
+      <tr><td class="mono">version</td><td><span class="badge--solid badge">MUST</span></td><td><code>"1.0"</code></td></tr>
+      <tr><td class="mono">id</td><td><span class="badge">SHOULD</span></td><td>Unique id (UUID/CUID/URI). Enables dedup &amp; replay detection.</td></tr>
+      <tr><td class="mono">issuer.id / issuer.keyDiscovery</td><td><span class="badge--solid badge">MUST</span></td><td>Origin URL + key-discovery URL (§5).</td></tr>
+      <tr><td class="mono">subject.contentHash.{algorithm,value}</td><td><span class="badge--solid badge">MUST</span></td><td><code>SHA-256</code> (only algo in v1.0) + hex of raw evidence bytes.</td></tr>
+      <tr><td class="mono">subject.files[]</td><td><span class="badge">MAY</span></td><td>Present for multi-file bundles (§8).</td></tr>
+      <tr><td class="mono">proof.{type,algorithm,publicKeyFingerprint,signatureValue}</td><td><span class="badge--solid badge">MUST</span></td><td>The signature and how to identify the key.</td></tr>
+      <tr><td class="mono">proof.canonicalization / proof.signedFields</td><td><span class="badge--solid badge">MUST</span></td><td><code>sorted-keys-2space</code> / <code>"subject"</code> in v1.0.</td></tr>
+      <tr><td class="mono">proof.timestamp</td><td><span class="badge">SHOULD</span></td><td>Present when a TSA timestamp was obtained (§6).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Registered evidence types (<code>subject.type</code>)</h3>
+  <table>
+    <thead><tr><th style="width:340px">Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">compliance-evidence</td><td>General evidence (screenshots, exports, reports).</td></tr>
+      <tr><td class="mono">compliance-evidence:screenshot</td><td>A screenshot or series of screenshots.</td></tr>
+      <tr><td class="mono">compliance-evidence:configuration</td><td>Config export (JSON, YAML, XML).</td></tr>
+      <tr><td class="mono">compliance-evidence:log</td><td>System or audit log extract.</td></tr>
+      <tr><td class="mono">compliance-evidence:attestation</td><td>Human attestation or signed declaration.</td></tr>
+      <tr><td class="mono">compliance-evidence:scan-result</td><td>Output from a security or compliance scanner.</td></tr>
+      <tr><td class="mono">compliance-evidence:policy</td><td>A compliance policy document.</td></tr>
+      <tr><td class="mono">compliance-evidence:bundle</td><td>A ZIP/archive of multiple artifacts (§8).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-title">Important Property — the signature is scoped to <code>subject</code></div>
+    <p><code>proof.signedFields = "subject"</code>. The <code>proof</code> block and the outer routing fields are <em>not</em> signed. This is deliberate: a verifier can rewrite <code>proof.timestamp</code> (e.g. re-fetch a TSA token) or change <code>issuer.name</code> for display without invalidating the proof. Anything an auditor must trust — the content hash, the framework, the control reference — lives inside <code>subject</code>.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 2. WHERE THE DATA COMES FROM ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 2</div>
+    <div class="section-title">Signature Computation &amp; Canonicalization</div>
+    <div class="section-tag">SIGNING</div>
+  </div>
+
+  <p>The signature is computed over a <strong>canonical representation</strong> of the <code>subject</code> object, not its raw on-disk JSON. JSON key ordering is not guaranteed by the spec, so re-serializing the same logical object can produce different bytes and break verification. Canonicalization removes that ambiguity.</p>
+
+  <h3>Supported algorithms</h3>
+  <table>
+    <thead><tr><th>Algorithm ID</th><th>proof.type</th><th>Key Type</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">RSA-SHA256</td><td class="mono">RsaSignature2024</td><td>RSA — 2048-bit min, 4096-bit recommended (RSASSA-PKCS1-v1_5)</td></tr>
+      <tr><td class="mono">ECDSA-SHA256</td><td class="mono">EcdsaSignature2024</td><td>EC P-256 (secp256r1)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Canonicalization — <code>sorted-keys-2space</code></h3>
+  <p>Extract <code>subject</code> → serialize to JSON with <strong>recursively sorted keys</strong> and <strong>2-space indentation</strong> → encode as <strong>UTF-8 bytes</strong>. That byte sequence is the signing input. Sorted keys with 2-space indent were chosen over pure compaction (or <a href="https://www.rfc-editor.org/rfc/rfc8785">RFC 8785 JCS</a>) for human readability while debugging.</p>
+
+  <pre>function stableStringify(obj) {
+  if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(stableStringify).join(',') + ']';
+  const keys = Object.keys(obj).sort();
+  return '{' + keys.map(k =&gt; JSON.stringify(k) + ':' + stableStringify(obj[k])).join(',') + '}';
+}
+// signingInput = utf8_encode(stableStringify(subject))  // 2-space indented form</pre>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 360" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-ui); font-size: 11px;">
+      <g font-family="JetBrains Mono" fill="#64748b" font-size="10">
+        <text x="20" y="30">PHASE 1</text>
+        <text x="290" y="30">PHASE 2</text>
+        <text x="560" y="30">PHASE 3</text>
+        <text x="830" y="30">PHASE 4</text>
+      </g>
+      <g fill="none" stroke="#0f172a" stroke-width="1.5">
+        <rect x="20" y="40" width="240" height="96"/>
+        <rect x="290" y="40" width="240" height="96"/>
+        <rect x="560" y="40" width="240" height="96"/>
+        <rect x="830" y="40" width="230" height="96"/>
+      </g>
+      <g font-family="Inter" font-weight="600" fill="#0f172a" font-size="12">
+        <text x="34" y="64">Hash content</text>
+        <text x="304" y="64">Build subject</text>
+        <text x="574" y="64">Sign</text>
+        <text x="844" y="64">Timestamp (opt.)</text>
+      </g>
+      <g font-family="JetBrains Mono" fill="#64748b" font-size="10">
+        <text x="34" y="86">contentHash =</text>
+        <text x="34" y="100">hex(SHA-256(bytes))</text>
+        <text x="34" y="120">per-file for bundles</text>
+        <text x="304" y="86">contentHash + files[]</text>
+        <text x="304" y="100">+ metadata</text>
+        <text x="304" y="120">→ canonical UTF-8</text>
+        <text x="574" y="86">sig = SIGN(canonical,</text>
+        <text x="574" y="100">privKey, algorithm)</text>
+        <text x="574" y="120">signatureValue=b64(sig)</text>
+        <text x="844" y="86">tsaDigest =</text>
+        <text x="844" y="100">SHA-256(sig_bytes)</text>
+        <text x="844" y="120">token = TSA(tsaDigest)</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+        <line x1="260" y1="88" x2="290" y2="88"/><polyline points="282,82 290,88 282,94"/>
+        <line x1="530" y1="88" x2="560" y2="88"/><polyline points="552,82 560,88 552,94"/>
+        <line x1="800" y1="88" x2="830" y2="88"/><polyline points="822,82 830,88 822,94"/>
+      </g>
+      <g fill="none" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 4"><rect x="20" y="170" width="1040" height="170"/></g>
+      <text x="32" y="190" font-family="JetBrains Mono" fill="#64748b" font-size="10">RESULTING ENVELOPE FIELDS WRITTEN</text>
+      <g fill="none" stroke="#cbd5e1" stroke-width="1">
+        <rect x="40" y="206" width="240" height="118"/>
+        <rect x="300" y="206" width="240" height="118"/>
+        <rect x="560" y="206" width="240" height="118"/>
+        <rect x="820" y="206" width="220" height="118"/>
+      </g>
+      <g font-family="JetBrains Mono" font-size="10.5" fill="#0f172a">
+        <text x="52" y="228">subject.contentHash</text>
+        <text x="52" y="246">.value</text>
+        <text x="52" y="272">subject.files[i]</text>
+        <text x="52" y="290">.contentHash.value</text>
+        <text x="312" y="228">subject.metadata</text>
+        <text x="312" y="246">subject.type</text>
+        <text x="312" y="272">(canonical bytes are</text>
+        <text x="312" y="290">the signing input)</text>
+        <text x="572" y="228">proof.signatureValue</text>
+        <text x="572" y="246">proof.algorithm</text>
+        <text x="572" y="272">proof.publicKey-</text>
+        <text x="572" y="290">Fingerprint</text>
+        <text x="832" y="228">proof.timestamp</text>
+        <text x="832" y="246">.token</text>
+        <text x="832" y="272">.authority</text>
+        <text x="832" y="290">.serialNumber</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" fill="none">
+        <line x1="140" y1="136" x2="140" y2="206"/>
+        <line x1="410" y1="136" x2="410" y2="206"/>
+        <line x1="680" y1="136" x2="680" y2="206"/>
+        <line x1="945" y1="136" x2="945" y2="206"/>
+      </g>
+    </svg>
+    <div class="canvas-caption">Fig 2.1 — Signing process (§4.3): each phase writes specific envelope fields</div>
+  </div>
+
+  <h3>Content hash &amp; fingerprint rules</h3>
+  <ul>
+    <li><strong>Single file:</strong> SHA-256 of the file bytes.</li>
+    <li><strong>Bundle (ZIP):</strong> SHA-256 of the <em>entire ZIP bytes</em>; per-file hashes go in <code>subject.files[]</code>.</li>
+    <li><strong>Structured data:</strong> SHA-256 of the <em>exact bytes</em> as stored/transmitted — no normalization.</li>
+    <li><strong>Fingerprint:</strong> <code>hex(SHA-256(pem_public_key)).substring(0, 16)</code>, PEM including BEGIN/END delimiters, LF line endings.</li>
+  </ul>
+
+  <div class="callout callout--warn">
+    <div class="callout-title">Gotcha — hash the exact bytes, never a re-encoding</div>
+    <p>For structured formats (JSON, XML, CSV) the hash covers the precise bytes the recipient receives. Semantic equivalence is <em>not</em> sufficient — re-serializing a JSON file with different whitespace yields a different hash. Likewise, re-zipping the same logical bundle with different compression settings changes the bundle hash. This is intentional: artifacts are identified by their bytes, not their logical content.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 3. EVALUATOR DISPATCH ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 3</div>
+    <div class="section-title">Key Discovery Protocol</div>
+    <div class="section-tag">DISCOVERY</div>
+  </div>
+
+  <p>A verifier needs the issuer's public key to check a signature. OES uses a well-known endpoint convention so no out-of-band key exchange is required. Issuers MUST serve a JSON document at:</p>
+
+  <pre>GET {issuer.id}/.well-known/oes-signing</pre>
+
+  <p>The document lists every key the issuer has used, each tagged with a <code>fingerprint</code>, <code>algorithm</code>, <code>publicKeyPem</code>, validity window, and a <code>revoked</code> flag. The verifier picks the entry whose <code>fingerprint</code> matches <code>proof.publicKeyFingerprint</code>.</p>
+
+  <div class="canvas">
+    <div class="tree">
+<span class="cond">// key matching during verification (§5.3)</span><br>
+doc = GET <code>{issuer.keyDiscovery}</code>  <span style="color: var(--c-text-mute);">// MUST be HTTPS in production</span><br>
+key = doc.keys.find(k =&gt; k.fingerprint === proof.publicKeyFingerprint)<br>
+<span class="cond">if</span> !key:<br>
+&nbsp;&nbsp;<span class="branch">→ FAIL("unknown signing key")</span><br>
+<span class="cond">else if</span> key.revoked === true:<br>
+&nbsp;&nbsp;<span class="branch">→ FAIL("signing key revoked")</span><br>
+<span class="cond">else if</span> key.validTo &amp;&amp; key.validTo &lt; now:<br>
+&nbsp;&nbsp;<span class="branch">→ WARN("expired")</span>  <span style="color: var(--c-text-mute);">// cleared if a valid TSA timestamp predates validTo (§7.5.8)</span><br>
+<span class="cond">else</span>:<br>
+&nbsp;&nbsp;<span class="branch">→ use key.publicKeyPem for verification</span>
+    </div>
+    <div class="canvas-caption">Fig 3.1 — Key matching &amp; status checks (§5.3)</div>
+  </div>
+
+  <h3>Discovery document fields</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">issuer</td><td>Origin URL; MUST match envelope <code>issuer.id</code>.</td></tr>
+      <tr><td class="mono">specVersion</td><td><code>"1.0"</code>.</td></tr>
+      <tr><td class="mono">keys[].fingerprint</td><td>16 hex chars — the routing key.</td></tr>
+      <tr><td class="mono">keys[].publicKeyPem</td><td>Full PEM (BEGIN/END delimiters).</td></tr>
+      <tr><td class="mono">keys[].validFrom / validTo</td><td>ISO 8601; <code>validTo</code> may be <code>null</code> (no expiry).</td></tr>
+      <tr><td class="mono">keys[].revoked</td><td>Boolean. A revoked key hard-fails verification.</td></tr>
+      <tr><td class="mono">supportedAlgorithms</td><td><code>["RSA-SHA256","ECDSA-SHA256"]</code>.</td></tr>
+      <tr><td class="mono">verificationEndpoint</td><td>Optional URL for server-side verification.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Operational rules</h3>
+  <ul>
+    <li><strong>Rotation:</strong> old keys MUST remain in <code>keys[]</code> (with original dates) until all evidence signed with them is past retention. Issuers SHOULD set <code>validTo</code> or <code>revoked: true</code> rather than deleting keys.</li>
+    <li><strong>Caching:</strong> verifiers SHOULD cache discovery docs ≥ 1 hour and ≤ 24 hours; endpoints SHOULD send <code>Cache-Control</code>.</li>
+    <li><strong>BYOK:</strong> customer-managed keys appear in the same document alongside platform keys; the envelope's fingerprint routes to the right entry. Issuers MAY scope with <code>?org={orgIdentifier}</code> — an optional extension verifiers fall back from to the base path.</li>
+    <li><strong>Offline:</strong> once a key is cached, all subsequent envelopes signed by it verify with no network access (§7.3).</li>
+  </ul>
+</div>
+
+<!-- ─────────────────────────────── 4. LIFECYCLE ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 4</div>
+    <div class="section-title">RFC 3161 Timestamp Binding</div>
+    <div class="section-tag">TIMESTAMP</div>
+  </div>
+
+  <p>An <a href="https://www.rfc-editor.org/rfc/rfc3161">RFC 3161</a> timestamp proves the signature existed at a specific point in time, as attested by an independent TSA. This prevents backdating and provides a legally recognized temporal anchor under eIDAS and similar frameworks. Critically, the timestamp is taken over the <strong>signature bytes</strong> — not the content — so it binds the act of signing, not the artifact alone.</p>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 240" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-ui); font-size: 11px;">
+      <g fill="none" stroke="#0f172a" stroke-width="1.5"><rect x="20" y="50" width="220" height="76"/></g>
+      <text x="130" y="76" text-anchor="middle" font-weight="600" font-size="12">messageImprint</text>
+      <text x="130" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">SHA-256(sig bytes)</text>
+      <text x="130" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">+ nonce, certReq:true</text>
+
+      <g fill="none" stroke="#0f172a" stroke-width="1.5"><rect x="320" y="50" width="220" height="76"/></g>
+      <text x="430" y="76" text-anchor="middle" font-weight="600" font-size="12">TimeStampReq</text>
+      <text x="430" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">DER, POST to TSA</text>
+      <text x="430" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">application/timestamp-query</text>
+
+      <g fill="none" stroke="#0f172a" stroke-width="1.5"><rect x="620" y="50" width="220" height="76"/></g>
+      <text x="730" y="76" text-anchor="middle" font-weight="600" font-size="12">TimeStampToken</text>
+      <text x="730" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">status: granted (0)</text>
+      <text x="730" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">DER ContentInfo</text>
+
+      <g fill="none" stroke="#15803d" stroke-width="1.5"><rect x="920" y="50" width="140" height="76"/></g>
+      <text x="990" y="76" text-anchor="middle" font-weight="600" font-size="12" fill="#15803d">proof.timestamp</text>
+      <text x="990" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">token = b64(...)</text>
+      <text x="990" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">genTime, serial</text>
+
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+        <line x1="240" y1="88" x2="320" y2="88"/><polyline points="312,82 320,88 312,94"/>
+        <line x1="540" y1="88" x2="620" y2="88"/><polyline points="612,82 620,88 612,94"/>
+        <line x1="840" y1="88" x2="920" y2="88"/><polyline points="912,82 920,88 912,94"/>
+      </g>
+      <text x="430" y="40" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#64748b">ISSUER → TSA</text>
+      <text x="730" y="40" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#64748b">TSA → ISSUER</text>
+      <text x="540" y="170" text-anchor="middle" font-family="Inter" font-size="11" fill="#64748b">Verifier reverses this: recompute SHA-256(sig bytes), parse the token's TSTInfo,</text>
+      <text x="540" y="188" text-anchor="middle" font-family="Inter" font-size="11" fill="#64748b">and assert TSTInfo.messageImprint.hashedMessage == that digest (§6.3).</text>
+    </svg>
+    <div class="canvas-caption">Fig 4.1 — RFC 3161 request/response (§6.2) and what the verifier re-checks</div>
+  </div>
+
+  <h3>Recommended TSA providers</h3>
+  <table>
+    <thead><tr><th>Provider</th><th>URL</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>DigiCert</td><td class="mono">http://timestamp.digicert.com</td><td>Widely trusted, no rate limit.</td></tr>
+      <tr><td>Sectigo</td><td class="mono">http://timestamp.sectigo.com</td><td>Free tier available.</td></tr>
+      <tr><td>FreeTSA</td><td class="mono">https://freetsa.org/tsr</td><td>Open, free.</td></tr>
+      <tr><td>GlobalSign</td><td class="mono">http://timestamp.globalsign.com/tsa/r6advanced1</td><td>Enterprise.</td></tr>
+    </tbody>
+  </table>
+  <p>The spec mandates no single TSA. Issuers SHOULD use multiple TSAs with fallback for reliability. Verifiers allow 5 minutes of clock skew and MAY optionally verify the TSA certificate chain against known roots.</p>
+</div>
+
+<!-- ─────────────────────────────── 5. WORKED EXAMPLE ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 5</div>
+    <div class="section-title">Verification Algorithm — Envelope to Verdict</div>
+    <div class="section-tag">VERIFY</div>
+  </div>
+
+  <p>This is the normative procedure. A compliant verifier MUST implement every REQUIRED step. The input is an envelope plus (optionally) the raw evidence bytes; the output is a verdict with collected warnings. Each numbered step below maps to the left column of Fig 5.1.</p>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 560" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-ui); font-size: 11px;">
+      <!-- LEFT: numbered steps -->
+      <g fill="none" stroke="#0f172a" stroke-width="1.5">
+        <rect x="20" y="20" width="300" height="64"/>
+        <rect x="20" y="104" width="300" height="64"/>
+        <rect x="20" y="188" width="300" height="64"/>
+        <rect x="20" y="272" width="300" height="64"/>
+        <rect x="20" y="356" width="300" height="64"/>
+      </g>
+      <g fill="none" stroke="#15803d" stroke-width="1.5"><rect x="20" y="448" width="300" height="76"/></g>
+      <g font-family="JetBrains Mono" font-size="10" fill="#64748b">
+        <text x="32" y="40">1 · STRUCTURE</text>
+        <text x="32" y="124">2 · CONTENT</text>
+        <text x="32" y="208">3 · KEY</text>
+        <text x="32" y="292">4 · SIGNATURE</text>
+        <text x="32" y="376">5 · TIMESTAMP</text>
+        <text x="32" y="468" fill="#15803d">6 · VERDICT</text>
+      </g>
+      <g font-family="Inter" font-weight="600" font-size="12" fill="#0f172a">
+        <text x="32" y="58">Parse &amp; validate</text>
+        <text x="32" y="142">Verify content integrity</text>
+        <text x="32" y="226">Obtain public key</text>
+        <text x="32" y="310">Verify signature</text>
+        <text x="32" y="394">Verify timestamp (if any)</text>
+        <text x="32" y="490" fill="#15803d">Return result</text>
+      </g>
+      <g font-family="Inter" font-size="10" fill="#64748b">
+        <text x="32" y="74">@context, version, required fields</text>
+        <text x="32" y="158">SHA-256(bytes) == subject.contentHash</text>
+        <text x="32" y="242">fetch discovery; match fingerprint</text>
+        <text x="32" y="326">b64-decode sig vs canonical subject</text>
+        <text x="32" y="410">SHA-256(sig) == TSTInfo imprint</text>
+        <text x="32" y="506">valid, signedAt, timestampedAt, warnings[]</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+        <line x1="170" y1="84" x2="170" y2="104"/><polyline points="164,96 170,104 176,96"/>
+        <line x1="170" y1="168" x2="170" y2="188"/><polyline points="164,180 170,188 176,180"/>
+        <line x1="170" y1="252" x2="170" y2="272"/><polyline points="164,264 170,272 176,264"/>
+        <line x1="170" y1="336" x2="170" y2="356"/><polyline points="164,348 170,356 176,348"/>
+        <line x1="170" y1="420" x2="170" y2="448"/><polyline points="164,440 170,448 176,440"/>
+      </g>
+
+      <!-- RIGHT: failure / state container -->
+      <g fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"><rect x="380" y="20" width="680" height="504"/></g>
+      <text x="394" y="40" font-family="JetBrains Mono" font-size="10" fill="#64748b">FAIL/WARN PATHS &amp; WHAT EACH STEP TOUCHES</text>
+
+      <g fill="none" stroke="#dc2626" stroke-width="1.5">
+        <rect x="400" y="56" width="640" height="56"/>
+        <rect x="400" y="200" width="640" height="56"/>
+        <rect x="400" y="296" width="640" height="56"/>
+      </g>
+      <g fill="none" stroke="#d97706" stroke-width="1.5"><rect x="400" y="128" width="640" height="56"/><rect x="400" y="392" width="640" height="76"/></g>
+
+      <g font-family="JetBrains Mono" font-size="11" fill="#dc2626">
+        <text x="414" y="78">Step 2: hash mismatch → FAIL("content hash mismatch")</text>
+        <text x="414" y="222">Step 3: key not found / revoked → FAIL</text>
+        <text x="414" y="318">Step 4: sig invalid → FAIL("invalid signature")</text>
+      </g>
+      <g font-family="Inter" font-size="10" fill="#64748b">
+        <text x="414" y="96">also checks each subject.files[i] hash individually</text>
+        <text x="414" y="240">discovery fetched over HTTPS; cache 1–24h</text>
+        <text x="414" y="336">canonical = utf8(stableStringify(subject))</text>
+      </g>
+
+      <g font-family="JetBrains Mono" font-size="11" fill="#d97706">
+        <text x="414" y="150">Step 3.5: key expired → WARN (may be cleared by §5.8)</text>
+        <text x="414" y="414">Step 5: genTime &gt; now+5min → WARN("future timestamp")</text>
+      </g>
+      <text x="414" y="168" font-family="Inter" font-size="10" fill="#64748b">cleared if a valid timestamp predates key.validTo</text>
+      <text x="414" y="432" font-family="Inter" font-size="10" fill="#64748b">no proof.timestamp → PASS with no temporal claim</text>
+      <text x="414" y="450" font-family="Inter" font-size="10" fill="#64748b">if §3.5 warned: assert genTime &lt; key.validTo to clear it</text>
+
+      <g fill="none" stroke="#15803d" stroke-width="1.5"><rect x="400" y="484" width="640" height="32"/></g>
+      <text x="414" y="504" font-family="JetBrains Mono" font-size="11" fill="#15803d">All required steps pass → { valid: true, contentHashVerified, keyFingerprint }</text>
+    </svg>
+    <div class="canvas-caption">Fig 5.1 — Verification procedure (§7.1): six steps, their fail/warn paths, and the verdict</div>
+  </div>
+
+  <h3>Two important variants</h3>
+  <ol>
+    <li><strong>Without evidence bytes (§7.2):</strong> when checking only a signature database, Steps 2.1–2.4 are skipped and the result MUST report <code>contentHashVerified: false</code>.</li>
+    <li><strong>Offline (§7.3):</strong> after the discovery doc is fetched once and the key cached, every later envelope from that key verifies with no network access.</li>
+  </ol>
+
+  <div class="callout">
+    <div class="callout-title">Why an expired key can still produce a valid signature</div>
+    <p>An expired <code>validTo</code> only WARNs. If a valid RFC 3161 timestamp proves the signature was created <em>while the key was active</em> (<code>genTime &lt; validTo</code>), the warning clears. The signature was honestly produced; the key simply retired afterward. This is the whole point of binding the timestamp to the signature bytes.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 6. DATA MODEL ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 6</div>
+    <div class="section-title">Multi-File Bundles &amp; the Internal Manifest</div>
+    <div class="section-tag">BUNDLE</div>
+  </div>
+
+  <p>When evidence is several files (screenshots + PDFs + config exports), <code>subject.type</code> is <code>compliance-evidence:bundle</code> and the evidence is a ZIP. OES then provides <strong>two levels of integrity</strong>: a bundle-level hash over the whole ZIP, and per-file hashes in <code>subject.files[]</code>. Inside the ZIP, a REQUIRED <code>manifest.json</code> at the archive root carries the structured metadata an auditor reads, and its file hashes MUST mirror <code>subject.files[]</code> exactly.</p>
+
+  <div class="canvas">
+    <svg width="100%" viewBox="0 0 1080 420" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-ui); font-size: 11px;">
+      <!-- OES envelope -->
+      <g fill="none" stroke="#0f172a" stroke-width="2"><rect x="20" y="40" width="300" height="150"/></g>
+      <text x="32" y="60" font-family="JetBrains Mono" font-size="10" fill="#dc2626">OES ENVELOPE (.oes.json)</text>
+      <text x="32" y="84" font-family="JetBrains Mono" font-size="11">subject.contentHash.value</text>
+      <text x="40" y="100" font-family="Inter" font-size="10" fill="#64748b">= SHA-256(bundle ZIP bytes)</text>
+      <text x="32" y="124" font-family="JetBrains Mono" font-size="11">subject.files[i]</text>
+      <text x="40" y="140" font-family="Inter" font-size="10" fill="#64748b">filename, contentHash.value, size</text>
+      <text x="32" y="164" font-family="JetBrains Mono" font-size="11">subject.metadata</text>
+      <text x="40" y="180" font-family="Inter" font-size="10" fill="#64748b">title, collectedAt, framework, controlRef</text>
+
+      <!-- bundle ZIP -->
+      <g fill="none" stroke="#0f172a" stroke-width="1.5"><rect x="420" y="40" width="300" height="330"/></g>
+      <text x="432" y="60" font-family="JetBrains Mono" font-size="10" fill="#64748b">evidence-bundle-&lt;id&gt;.zip</text>
+      <g fill="none" stroke="#94a3b8" stroke-width="1"><rect x="436" y="74" width="268" height="58"/></g>
+      <text x="448" y="92" font-family="JetBrains Mono" font-size="10.5" fill="#dc2626">manifest.json  (REQUIRED, root)</text>
+      <text x="448" y="110" font-family="Inter" font-size="10" fill="#64748b">specVersion, bundleId, title,</text>
+      <text x="448" y="124" font-family="Inter" font-size="10" fill="#64748b">files{screenshots,attachments,…}, auditTrail</text>
+      <g fill="none" stroke="#cbd5e1" stroke-width="1">
+        <rect x="436" y="146" width="268" height="58"/>
+        <rect x="436" y="218" width="268" height="58"/>
+        <rect x="436" y="290" width="268" height="58"/>
+      </g>
+      <text x="448" y="166" font-family="JetBrains Mono" font-size="10.5">screenshots/</text>
+      <text x="448" y="184" font-family="Inter" font-size="10" fill="#64748b">step-001.png, step-002.png …</text>
+      <text x="448" y="238" font-family="JetBrains Mono" font-size="10.5">attachments/</text>
+      <text x="448" y="256" font-family="Inter" font-size="10" fill="#64748b">iam-config.json, access-review.csv</text>
+      <text x="448" y="310" font-family="JetBrains Mono" font-size="10.5">comments.txt (root, optional)</text>
+      <text x="448" y="328" font-family="Inter" font-size="10" fill="#64748b">video → URL only, NOT inside ZIP</text>
+
+      <!-- mapping arrows -->
+      <g stroke="#0f172a" stroke-width="1" fill="none">
+        <line x1="320" y1="90" x2="420" y2="90"/><polyline points="412,84 420,90 412,96"/>
+        <line x1="320" y1="130" x2="420" y2="160"/>
+      </g>
+      <text x="730" y="40" font-family="JetBrains Mono" font-size="10" fill="#64748b">INVARIANTS (§8.5)</text>
+      <g fill="none" stroke="#cbd5e1" stroke-width="1"><rect x="730" y="56" width="330" height="200"/></g>
+      <g font-family="JetBrains Mono" font-size="10" fill="#0f172a">
+        <text x="742" y="78">manifest.files[i].sha256</text>
+        <text x="742" y="92">  == subject.files[i].contentHash.value</text>
+        <text x="742" y="116">manifest.files[i].size</text>
+        <text x="742" y="130">  == subject.files[i].size</text>
+        <text x="742" y="154">manifest.title == metadata.title</text>
+        <text x="742" y="178">manifest.generatedAt</text>
+        <text x="742" y="192">  == metadata.collectedAt</text>
+        <text x="742" y="216">framework / controlRef align</text>
+      </g>
+      <text x="742" y="244" font-family="Inter" font-size="10" fill="#d97706">Mismatches are WARNINGS, not errors.</text>
+
+      <g fill="none" stroke="#cbd5e1" stroke-width="1"><rect x="730" y="280" width="330" height="90"/></g>
+      <text x="742" y="300" font-family="JetBrains Mono" font-size="10" fill="#64748b">FILENAME RULES</text>
+      <g font-family="Inter" font-size="10" fill="#64748b">
+        <text x="742" y="320">forward slashes only; no leading ./ or /</text>
+        <text x="742" y="336">no ".."; unique within archive</text>
+        <text x="742" y="352">every archive entry ↔ manifest entry</text>
+        <text x="742" y="366">(except manifest.json itself)</text>
+      </g>
+    </svg>
+    <div class="canvas-caption">Fig 6.1 — Bundle layout, envelope↔manifest invariants (§8.3–§8.5)</div>
+  </div>
+
+  <h3>Bundle file categories (§8.3)</h3>
+  <table>
+    <thead><tr><th>Category</th><th>Path prefix</th><th>Manifest location</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Screenshots</td><td class="mono">screenshots/</td><td class="mono">files.screenshots[]</td><td>PNG/JPEG. Optional <code>stepNumber</code>, <code>caption</code>.</td></tr>
+      <tr><td>Attachments</td><td class="mono">attachments/</td><td class="mono">files.attachments[]</td><td>Any MIME. <code>originalName</code>, <code>mediaType</code>.</td></tr>
+      <tr><td>Comments</td><td><em>(root)</em></td><td class="mono">files.comments_txt</td><td>Single <code>comments.txt</code>.</td></tr>
+      <tr><td>Video</td><td><em>(not in ZIP)</em></td><td class="mono">files.video</td><td>Unsigned URL reference; media stays outside for size.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Inner signatures &amp; extension fields</h3>
+  <ul>
+    <li><strong>Inner signatures (§8.6) are OPTIONAL.</strong> When an OES envelope ships alongside the bundle, the envelope already covers everything, so <code>innerSignature</code> is redundant and MAY be omitted. It exists for standalone/offline transfer of a bundle without an envelope.</li>
+    <li>When both are present, the inner signature MUST use the <em>same</em> key (matching <code>publicKeyFingerprint</code>) and is verified as a defense-in-depth check; a divergence is a high-severity warning (likely producer bug or tampering).</li>
+    <li>If neither signature is present, the bundle is reported <code>UNSIGNED</code> and hashes alone are relied on.</li>
+    <li><strong>Extension fields (§8.7):</strong> producer-specific data MUST be carried under <code>x-*</code> prefixes (e.g. <code>metadata.x-workspace-id</code>). Verifiers MUST ignore unknown <code>x-*</code> fields but MUST reject unknown <em>non-</em><code>x-*</code> top-level fields.</li>
+  </ul>
+</div>
+
+<!-- ─────────────────────────────── 7. ANTI-PATTERNS ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 7</div>
+    <div class="section-title">Security Considerations &amp; Pitfalls</div>
+    <div class="section-tag">SECURITY</div>
+  </div>
+
+  <p>These are the failure modes most likely to bite implementers. Several mirror normative MUSTs from §11; the rest are integration mistakes seen in practice.</p>
+
+  <div class="grid-2">
+    <div class="callout callout--warn">
+      <div class="callout-title">Pitfall · Re-encoding before hashing</div>
+      <p><code>subject.contentHash</code> covers the <em>exact bytes received</em>. Verifiers MUST hash the bytes as-is, never a transcoded or re-serialized version. For JSON/XML, byte-level comparison is required — semantic equivalence is not sufficient (§11.5).</p>
+    </div>
+    <div class="callout callout--warn">
+      <div class="callout-title">Pitfall · Skipping unknown algorithms</div>
+      <p>A verifier MUST <strong>reject</strong> envelopes with an unrecognized <code>proof.algorithm</code>, not silently skip signature verification (§15.3). Silent skips turn a future algorithm into a forgery vector.</p>
+    </div>
+    <div class="callout callout--warn">
+      <div class="callout-title">Pitfall · Trusting the fingerprint as a security identifier</div>
+      <p>The 16-hex fingerprint gives 64 bits of collision resistance — enough to route to the right key within one issuer's small key set, but it is <em>not</em> security-critical. The full public key is always fetched from discovery; never authenticate on the fingerprint alone (§11.6).</p>
+    </div>
+    <div class="callout callout--warn">
+      <div class="callout-title">Pitfall · HTTP discovery in production</div>
+      <p>Discovery documents and verification endpoints MUST be served over HTTPS in production (§11.1). HTTP is acceptable only for local dev. A MITM on discovery substitutes the key and defeats the whole scheme.</p>
+    </div>
+  </div>
+
+  <h3>Other normative security rules</h3>
+  <ul>
+    <li><strong>Key storage (§11.2):</strong> platform keys in an HSM or encrypted env with restricted access; BYOK keeps the private key in the customer's control (issuer stores only the public key); cloud KMS performs signing inside the KMS service.</li>
+    <li><strong>Clock skew (§11.3):</strong> allow 5 minutes when checking <code>proof.created</code> and <code>timestamp.timestampedAt</code>. TSA timestamps largely mitigate skew concerns.</li>
+    <li><strong>Replay protection (§11.4):</strong> the <code>id</code> field gives envelope uniqueness; ingestors SHOULD track seen <code>id</code> values to detect replays.</li>
+  </ul>
+</div>
+
+<!-- ─────────────────────────────── 8. PROCEDURE ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 8</div>
+    <div class="section-title">Reuse, Interop &amp; Production Mapping</div>
+    <div class="section-tag">INTEROP</div>
+  </div>
+
+  <p>OES is designed so a third party can verify evidence with no relationship to the issuer. The flow below is the auditor path; GRC platforms and CI/CD pipelines follow the same shape (import → verify → display, optionally re-sign to extend a chain of custody).</p>
+
+  <div class="canvas">
+    <div class="flow-vertical">
+      <div class="node">
+        <div class="node-label">Step 1 · Receive</div>
+        <div class="node-title">Evidence file(s) + the OES envelope</div>
+        <div class="node-desc">Distributed side-by-side: <code>evidence.zip</code> + <code>evidence.oes.json</code>, plus a cached <code>issuer-discovery.json</code>.</div>
+      </div>
+      <div class="flow-arrow-v">↓</div>
+      <div class="node">
+        <div class="node-label">Step 2 · Verify</div>
+        <div class="node-title">Run the §7 algorithm</div>
+        <div class="node-desc">~100 LOC reference verifier in Node or Python. No account, API key, or issuer relationship needed.</div>
+      </div>
+      <div class="flow-arrow-v">↓</div>
+      <div class="node">
+        <div class="node-label">Step 3 · Anchor trust</div>
+        <div class="node-title">TSA timestamp + discovered key</div>
+        <div class="node-desc">The RFC 3161 timestamp from a recognized authority confirms <em>when</em>; the well-known key confirms <em>who</em>.</div>
+      </div>
+      <div class="flow-arrow-v">↓</div>
+      <div class="node node--accent">
+        <div class="node-label">Step 4 · Record</div>
+        <div class="node-title">Put the verdict in workpapers</div>
+        <div class="node-desc">valid/invalid, timestamp, issuer. For chain of custody, a platform MAY emit its own envelope referencing the prior one via <code>metadata.priorEnvelopes[]</code>.</div>
+      </div>
+    </div>
+    <div class="canvas-caption">Fig 8.1 — Auditor reuse path (§9.1); GRC &amp; CI/CD reuse share the shape</div>
+  </div>
+
+  <h3>W3C Verifiable Credential mapping (informational, §10)</h3>
+  <table>
+    <thead><tr><th>OES Field</th><th>W3C VC Field</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">issuer.id</td><td class="mono">issuer (as did:web:{domain})</td></tr>
+      <tr><td class="mono">subject</td><td class="mono">credentialSubject</td></tr>
+      <tr><td class="mono">subject.contentHash</td><td class="mono">credentialSubject.digest</td></tr>
+      <tr><td class="mono">proof.signatureValue</td><td class="mono">proof.jws (wrapped in JWS)</td></tr>
+      <tr><td class="mono">proof.timestamp</td><td class="mono">proof entry, type: RFC3161Timestamp2024</td></tr>
+    </tbody>
+  </table>
+  <p>The OES envelope is the canonical format; VC is an export. <code>@context</code> versioning is semantic: minor versions add optional fields (a v1.0 verifier ignores unknown fields and still verifies v1.1 envelopes); major versions get a new <code>@context</code> URL.</p>
+
+  <h3>Production <code>ManifestV3</code> → OES bundle-manifest (Appendix D)</h3>
+  <p>Screenata's production internal manifest (<code>ManifestV3</code>, used by <code>evidence-pack.service.ts</code>) uses snake_case field names; the public OES form is camelCase with platform-specific data moved under <code>x-*</code>.</p>
+  <table>
+    <thead><tr><th>Production (ManifestV3)</th><th>OES (oes-1.0-bundle-manifest)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">version: "3.0"</td><td class="mono">specVersion: "oes-1.0-bundle-manifest"</td><td>Public versioning aligns to OES.</td></tr>
+      <tr><td class="mono">evidence_pack_id</td><td class="mono">bundleId</td><td>Camel-case alignment.</td></tr>
+      <tr><td class="mono">generated_at</td><td class="mono">generatedAt</td><td>Camel-case alignment.</td></tr>
+      <tr><td class="mono">metadata.workspace_id</td><td class="mono">metadata.x-workspace-id</td><td>Moved to extension namespace.</td></tr>
+      <tr><td class="mono">audit_trail.created_by_user_id</td><td class="mono">auditTrail.createdBy</td><td>Use email/actor name, not internal DB id.</td></tr>
+      <tr><td class="mono">audit_trail.workspace_id</td><td><em>(removed)</em></td><td>Redundant with <code>metadata.x-workspace-id</code>.</td></tr>
+      <tr><td class="mono">topic, doc</td><td class="mono">metadata.x-topic, metadata.x-doc</td><td>Platform-specific extensions.</td></tr>
+      <tr><td class="mono">cryptographic_signature</td><td class="mono">innerSignature</td><td>Renamed; OES envelope is the primary signature path.</td></tr>
+      <tr><td class="mono">verificationInstructions</td><td><em>(removed)</em></td><td>Deprecated compatibility field.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>How OES compares to existing standards (Appendix B)</h3>
+  <table>
+    <thead><tr><th>Dimension</th><th>OES v1.0</th><th>W3C VC</th><th>CMS/PKCS#7</th></tr></thead>
+    <tbody>
+      <tr><td>Format</td><td>JSON</td><td>JSON-LD / JWT</td><td>ASN.1 / DER</td></tr>
+      <tr><td>Timestamping</td><td>RFC 3161 (built-in)</td><td>Not specified</td><td>RFC 3161 (separate)</td></tr>
+      <tr><td>Key discovery</td><td class="mono">.well-known/oes-signing</td><td>DID resolution</td><td>X.509 cert chain</td></tr>
+      <tr><td>Legal standing</td><td>eIDAS via TSA</td><td>Varies</td><td>eIDAS-compatible</td></tr>
+      <tr><td>Verify complexity</td><td>~100 LOC</td><td>~500 LOC</td><td>~200 LOC</td></tr>
+      <tr><td>Evidence-specific fields</td><td>Yes (type, framework, control)</td><td>Generic</td><td>None</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─────────────────────────────── 9. REFERENCES ─────────────────────────────── -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">§ 9</div>
+    <div class="section-title">Conformance, Open Questions &amp; References</div>
+    <div class="section-tag">INDEX</div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3>Conformance (§16)</h3>
+      <p style="font-size:13px"><strong>Conformant issuer:</strong> produces schema-valid envelopes (§3), hashes per §4.4, signs with §4.2 canonicalization, serves discovery per §5, uses a supported algorithm (§4.1).</p>
+      <p style="font-size:13px"><strong>Conformant verifier:</strong> implements every REQUIRED step of §7, fetches keys via §5, reports <code>contentHashVerified: false</code> when bytes are absent, and rejects unsupported algorithms rather than skipping.</p>
+
+      <h3>Reference implementation</h3>
+      <ul>
+        <li><code>server/src/services/signing/</code> — RFC-132 introduced it; RFC-166 reorganized into <code>core/</code> (sign · verify · timestamp · discover · export).</li>
+        <li>Public entrypoints (<code>index.ts</code>): <code>signContent</code>, <code>signFiles</code>, <code>finalizeAndSignManifest</code>, <code>verifyContent</code>, <code>verifyManifest</code>, <code>verifyZip</code>, <code>requestTimestamp</code>, <code>verifyTimestamp</code>, <code>getDiscovery</code>, <code>toEnvelope</code>.</li>
+        <li><code>server/src/services/evidence-pack/evidence-pack.service.ts</code> — produces the production <code>ManifestV3</code> mapped in Appendix D.</li>
+      </ul>
+
+      <h3>Media type &amp; test vectors</h3>
+      <ul>
+        <li><code>application/vnd.oes+json</code> (informal: <code>application/json</code> with <code>.oes.json</code>).</li>
+        <li>Test vectors: <code>github.com/DeepGuide-Ai/open-evidence-signing/tree/main/test-vectors</code>.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Open questions for v1.1 (§17)</h3>
+      <ul>
+        <li><strong>Custody chain</strong> — structured <code>capturedBy</code>/<code>reviewedBy</code>/<code>approvedBy</code> beyond <code>createdBy</code>?</li>
+        <li><strong>Sampling metadata</strong> — population size &amp; method in <code>metadata</code> or a sidecar?</li>
+        <li><strong>Control mapping</strong> — inline all covered controls or only the primary <code>controlRef</code>?</li>
+        <li><strong>Redaction</strong> — record pre-redaction hash + transform, or only the post-redaction hash?</li>
+        <li><strong>Multi-signer bundles</strong> — <code>innerSignature[]</code> array vs <code>x-cosigners</code> extension?</li>
+        <li><strong>Inner-signature scope</strong> — whole-manifest-minus-<code>innerSignature</code> vs <code>files</code>-only.</li>
+        <li><strong>JCS</strong> — when to require <a href="https://www.rfc-editor.org/rfc/rfc8785">RFC 8785</a> over <code>sorted-keys-2space</code>.</li>
+      </ul>
+
+      <h3>Spec section map</h3>
+      <ul>
+        <li>§3 Envelope · §4 Signing · §5 Discovery · §6 Timestamp · §7 Verification</li>
+        <li>§8 Bundles · §9 Reuse · §10 VC mapping · §11 Security · §12 Reference verifier</li>
+        <li>§13 Example envelope · §14–§16 Naming/Versioning/Conformance · §17 Open questions</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footnote">
+    Canonical text source: <code>docs/specs/OPEN-EVIDENCE-SPEC-v1.md</code>. This HTML is the visual companion — when the protocol changes, update the Markdown first. OES v1.0 is Apache-2.0, last reviewed 2026-05-21. The protocol shape (envelope, canonicalization, key discovery, RFC 3161 binding, bundle layout, internal manifest) is implemented in <code>server/src/services/signing/</code>.
+  </div>
+</div>
+
+</div>
+</body>
+</html>

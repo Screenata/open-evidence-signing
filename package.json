@@ -35,7 +35,7 @@
     "bin",
     "dist",
     "schema",
-    "docs",
+    "docs/*.md",
     "python/oes_verify.py",
     "SPEC.md",
     "README.md",
