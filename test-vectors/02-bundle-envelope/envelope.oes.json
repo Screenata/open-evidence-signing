@@ -1,5 +1,5 @@
 {
-  "@context": "https://openevidence.org/signing/v1",
+  "@context": "https://openevidence.dev/signing/v1",
   "version": "1.0",
   "id": "env_vec_bundle_0002",
   "issuer": {

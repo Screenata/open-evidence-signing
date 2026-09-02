@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openevidence.org/signing/v1/bundle-manifest.schema.json",
+  "$id": "https://openevidence.dev/signing/v1/bundle-manifest.schema.json",
   "title": "OES v4.0 Evidence Pack Manifest",
   "description": "Schema for the production ManifestV3 (v4.0) evidence-pack manifest verified by oes-verify. See OPEN-EVIDENCE-SPEC-v1 §8.4 and Appendix D.",
   "type": "object",

@@ -112,7 +112,7 @@ export function assembleEnvelope(
   meta: { id: string; issuer: IssuerInput; created: string; timestamp?: EnvelopeTimestamp }
 ): EvidenceSigningEnvelope {
   return {
-    '@context': 'https://openevidence.org/signing/v1',
+    '@context': 'https://openevidence.dev/signing/v1',
     version: '1.0',
     id: meta.id,
     issuer: {

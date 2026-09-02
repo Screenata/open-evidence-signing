@@ -1,5 +1,5 @@
 {
-  "@context": "https://openevidence.org/signing/v1",
+  "@context": "https://openevidence.dev/signing/v1",
   "version": "1.0",
   "id": "env_vec_unknown_0007",
   "issuer": {
@@ -22,8 +22,8 @@
     "type": "RsaSignature2024",
     "created": "2026-04-20T10:30:00.000Z",
     "algorithm": "RSA-SHA256",
-    "publicKeyFingerprint": "b95e3e4fa7352d4a",
-    "signatureValue": "aV6vIzaUc62r73E9+EdIYaJYlYlVU89OX6QC+fxWLNyVQvtF77AWkhMz9k51Oc5JEtAEoLJnRF7UPXSrRwTaZTUJIlXN2IVR57vMg+IYzW7VDEfQc5we1CZOUQ1cOprJfTqMlOHFAH5yc1fDvxD1B+I6IdOye8krq7Xsme050i2QckMocvCgvC7Vo/Xhs+RK5ZhC4t1zeuFAKkO5BlvZfh3L18u2tmUaKWr08elIitNXVgT184VS+mmQgjEDWvnigOvyqLZntp2KNz1NxwVjduWdpLYL9KWalvA7DHlnM6AY3VIZrsZlv3YTIZwMo8vEAXhLEolx2MfYGvvUNs8YkA==",
+    "publicKeyFingerprint": "abffd185f6a6d545",
+    "signatureValue": "Nqv2efLS0qtigcHRuiTjD920W3Z4wzL8fGbNanKxkf4fnfbffti2FqZzzHb6dLX2J2nG8eD/NLUEmgYh0L3ouUMUyvWHA9ktCXoHsdoYbZqPg7yStsyiQxvJIL6w2kioHvOrB3da1MaZ3LToHIqQTwnlrUPtn73lW33QQSEV2ZLVV3ZvR1Bw8LR/WPAgvUwnCfE3KRiLvXEq7tM/8+6L/9XZhD/UzJ30AjBOnvl3+GsQlz4MeikhToBkNOJw/kJhZAXwOtB03l5xVGsGXTw6NVSUYzjgw6BbVEdcYxIbR8MoK+6BZGETBT8/BKGJ8gubtN9XxvQxKlumcQfg/ksYyA==",
     "canonicalization": "sorted-keys-2space",
     "signedFields": "subject"
   }

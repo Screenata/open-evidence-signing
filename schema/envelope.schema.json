@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openevidence.org/signing/v1/envelope.schema.json",
+  "$id": "https://openevidence.dev/signing/v1/envelope.schema.json",
   "title": "OES Evidence Signing Envelope (ESE) v1.0",
   "description": "Schema for an Open Evidence Signing envelope per OPEN-EVIDENCE-SPEC-v1 §3.",
   "type": "object",
   "required": ["@context", "version", "issuer", "subject", "proof"],
   "properties": {
-    "@context": { "const": "https://openevidence.org/signing/v1" },
+    "@context": { "enum": ["https://openevidence.dev/signing/v1", "https://openevidence.org/signing/v1"] },
     "version": { "const": "1.0" },
     "id": { "type": "string" },
     "issuer": {

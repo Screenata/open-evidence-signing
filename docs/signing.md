@@ -41,7 +41,7 @@ What you get back is a complete, spec-conformant envelope:
 
 ```jsonc
 {
-  "@context": "https://openevidence.org/signing/v1",
+  "@context": "https://openevidence.dev/signing/v1",
   "version": "1.0",
   "id": "env_…",
   "issuer": { "id": "https://compliance.acme.example", "name": "Acme Corp",

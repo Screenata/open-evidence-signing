@@ -3,7 +3,7 @@
  * v1.0 format. Verify signed compliance evidence without trusting (or even
  * contacting) the issuer.
  *
- * Spec: OPEN-EVIDENCE-SPEC-v1 (https://openevidence.org/signing/v1).
+ * Spec: OPEN-EVIDENCE-SPEC-v1 (https://openevidence.dev/signing/v1).
  * Apache-2.0. No runtime dependencies — Node built-ins only.
  *
  * @example

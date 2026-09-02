@@ -9,6 +9,7 @@ import { verifyTimestamp } from './timestamp';
 import { verifyEnvelopeBundleFiles } from './bundle';
 import {
   OES_CONTEXT,
+  OES_LEGACY_CONTEXTS,
   type EvidenceSigningEnvelope,
   type KeyResolver,
   type SigningAlgorithm,
@@ -53,7 +54,7 @@ export async function verifyEnvelope(
     return fail(['Invalid JSON in envelope']);
   }
 
-  if (envelope['@context'] !== OES_CONTEXT) {
+  if (envelope['@context'] !== OES_CONTEXT && !OES_LEGACY_CONTEXTS.includes(envelope['@context'])) {
     return fail([`Unsupported @context: ${envelope['@context']}`]);
   }
   if (envelope.version !== '1.0') {
@@ -77,6 +78,10 @@ export async function verifyEnvelope(
   const errors: string[] = [];
   const warnings: string[] = [];
   let contentHashVerified = false;
+
+  if (OES_LEGACY_CONTEXTS.includes(envelope['@context'])) {
+    warnings.push(`Envelope uses legacy @context "${envelope['@context']}" (pre-openevidence.dev namespace)`);
+  }
 
   // Step 2: content integrity (spec §7.1 step 2; skipped without bytes per §7.2)
   if (evidenceBytes) {
