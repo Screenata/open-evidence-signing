@@ -35,7 +35,6 @@ except ImportError:  # pragma: no cover
     sys.exit(2)
 
 OES_CONTEXT = "https://openevidence.dev/signing/v1"
-OES_LEGACY_CONTEXTS = {"https://openevidence.org/signing/v1"}  # pre-migration namespace, still verifiable
 SUPPORTED = {"RSA-SHA256", "ECDSA-SHA256"}
 SKEW = 5 * 60  # seconds
 
@@ -87,12 +86,9 @@ def verify_signature(public_pem: str, signature_b64: str, message: bytes, algori
 def verify_envelope(envelope, evidence_bytes, keys):
     result = {"valid": False, "contentHashVerified": False, "checks": [], "errors": [], "warnings": [], "details": {}}
 
-    ctx = envelope.get("@context")
-    if ctx != OES_CONTEXT and ctx not in OES_LEGACY_CONTEXTS:
+    if envelope.get("@context") != OES_CONTEXT:
         result["errors"].append("Unsupported @context")
         return result
-    if ctx in OES_LEGACY_CONTEXTS:
-        result["warnings"].append("Envelope uses legacy @context (pre-openevidence.dev namespace)")
     if envelope.get("version") != "1.0":
         result["errors"].append("Unsupported version")
         return result

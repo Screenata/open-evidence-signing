@@ -8,13 +8,6 @@
 
 export const OES_CONTEXT = 'https://openevidence.dev/signing/v1' as const;
 
-/**
- * Namespace URIs from before the 2026-09 migration to openevidence.dev.
- * Verifiers accept these on envelopes issued under the old namespace
- * (with a warning); producers MUST emit OES_CONTEXT.
- */
-export const OES_LEGACY_CONTEXTS: readonly string[] = ['https://openevidence.org/signing/v1'];
-
 export type SigningAlgorithm = 'RSA-SHA256' | 'ECDSA-SHA256';
 
 /** OES Evidence Signing Envelope (ESE) — spec §3.1. */

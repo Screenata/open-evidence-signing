@@ -113,7 +113,7 @@ The ESE is the core artifact of the specification. It is a JSON document that bi
 
 | Field | Required | Notes |
 |---|---|---|
-| `@context` | MUST | Always `"https://openevidence.dev/signing/v1"` (verifiers also accept the pre-migration `"https://openevidence.org/signing/v1"`, with a warning) |
+| `@context` | MUST | Always `"https://openevidence.dev/signing/v1"` |
 | `version` | MUST | `"1.0"` for this specification |
 | `id` | SHOULD | Unique identifier (UUID, CUID, or URI). Enables deduplication. |
 | `issuer.id` | MUST | Origin URL of the signing system |
@@ -1259,7 +1259,7 @@ Screenata's production internal manifest (`ManifestV3`) uses different field nam
 
 | Version | Date | Changes |
 |---|---|---|
-| 1.0 | 2026-09-02 | **Namespace migration**: canonical `@context` is now `https://openevidence.dev/signing/v1` (the previously named `openevidence.org` domain was never controlled by the spec authors). Not a version bump: `@context` sits outside the signed `subject`, so no signature is invalidated. Producers MUST emit the `.dev` URI; verifiers accept the legacy `.org` URI on previously issued envelopes and surface a warning. |
+| 1.0 | 2026-09-02 | **Namespace migration**: canonical `@context` is now `https://openevidence.dev/signing/v1` (the previously named `openevidence.org` domain was never controlled by the spec authors). Not a version bump: `@context` sits outside the signed `subject`, so no signature is invalidated — an envelope issued under the old URI verifies after updating its `@context` field to the canonical value. The `.org` URI is no longer valid and is rejected on verify. |
 | 1.0 | 2026-06-12 | Fixed §4.2 and §12 example code to match the normative `sorted-keys-2space` canonicalization (examples previously emitted compact JSON); fixed Python ECDSA verify call. No normative protocol changes. Reference implementation unified on raw-bytes signing across envelope, manifest (v4.0), and per-file signatures; legacy v3.0 hex-digest scheme retired. |
 | 1.0-draft | 2026-05-12 | Folded internal bundle-manifest definition into §8 (was previously a separate annex). Added §17 open questions. Added Appendix D production field mapping. |
 | 1.0-draft | 2026-04-27 | Initial specification. |
